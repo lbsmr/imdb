@@ -2,8 +2,10 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 from dash import Dash, dcc, html, Input, Output
+import dash_bootstrap_components as dbc
 
-app = Dash(__name__,assets_folder='./assets')
+app = Dash(__name__,external_stylesheets=[dbc.themes.BOOTSTRAP])
+# app = Dash(assets_folder='./assets')
 df = pd.read_csv('./top_250.csv')
 
 ## Get decade of release from each movie and create a new column in the dataframe
@@ -74,7 +76,6 @@ fig.update_layout(
     autosize = True,
     paper_bgcolor='rgba(0,0,0,0)',
     plot_bgcolor='rgba(0,0,0,0)',
-    font=dict(family = 'Arial',color = '#F8F8FF'),
     margin=dict(l=5, r=0, t=25, b=0)
 )
 
@@ -95,7 +96,6 @@ fig2.update_layout(
     autosize = True,
     paper_bgcolor='rgba(0,0,0,0)',
     plot_bgcolor='rgba(0,0,0,0)',
-    font=dict(family = 'Arial',color = '#F8F8FF'),
     margin=dict(l=5, r=0, t=25, b=0)
 )
 
@@ -114,7 +114,6 @@ fig3.update_layout(
     autosize = True,
     paper_bgcolor='rgba(0,0,0,0)',
     plot_bgcolor='rgba(0,0,0,0)',
-    font=dict(family = 'Arial',color = '#F8F8FF'),
     margin=dict(l=5, r=0, t=25, b=0)
 )
 
@@ -127,64 +126,91 @@ fig4.update_layout(
     autosize = True,
     paper_bgcolor='rgba(0,0,0,0)',
     plot_bgcolor='rgba(0,0,0,0)',
-    font=dict(family = 'Arial',color = '#F8F8FF'),
     margin=dict(l=5, r=0, t=25, b=0)
 )
 
-app.layout = html.Div(children = [
-    html.H1("IMDb scraping top 250 movies and analysis"),
-    html.H2("Decade distribution between top 250"),
-    html.Div(children = [
-        html.Div(className = 'static_graph', children = [
-            dcc.Graph(figure=fig,config={'displayModeBar': False})
-        ]),
-    ]),
-    html.H2("Count and average rating per genre"),
-    html.Div(children = [
-        html.Div(className = 'static_graph', children = [
-            dcc.Graph(figure=fig2,config={'displayModeBar': False})
-        ]),
-    ]),
-    html.H2("Genre popularity by decade"),
-    html.Div(children = [
-        html.Div(className = 'static_graph', children = [
-            dcc.Graph(figure=fig3,config={'displayModeBar': False})
-        ]),
-    ]),
-    html.H2("Vote count and rating around the years"),
-    html.Div(children = [
-        html.Div(className = 'static_graph', children = [
-            dcc.Graph(figure=fig4,config={'displayModeBar': False})
-        ]),
-    ]),
-    html.Div(children = [
-        html.H2("Cast with most appearances and highest average rating"),
-        html.Div(className = 'left_content' , children=[
-                html.H4('Select number of appearances or rating'),
-                dcc.Dropdown(id="s_slct",
-                                options=[
-                                    {'label':'Appearances','value':'Count'},
-                                    {'label':'Average rating','value':'Rating'}
-                                ],
-                                multi=False,
-                                value="Count",
-                                className='dropdown'
-                ),
-                html.H4('Select crew member'),
-                dcc.Dropdown(id="t_slct",
-                                options=[
-                                    {'label':'Actors/Actresses','value':'Actors'},
-                                    {'label':'Directors','value':'Directors'}
-                                ],
-                                multi=False,
-                                value="Actors",
-                                className='dropdown'
-                )
-        ]),
-        html.Div(className = 'right_content' , children = [
-            dcc.Graph(id='fig5', figure={},config={'displayModeBar': False})
-        ]),
-    ])
+app.layout = dbc.Container(children = [
+    html.H1("Scraping and analysis of IMDb top 250", className= 'p-6 mt-2'),
+    dbc.Row(align = 'center',children = [
+        dbc.Tabs(id = 'tabs', active_tab = 'count_decades', children = [
+                    dbc.Tab(label = 'Movie count per decade',tab_id = 'count_decades',children = [
+                        html.Div([
+                            html.H2("Decade distribution between top 250", className= 'p-3'),
+                            html.Div(children = [
+                                html.Div(className = 'static_graph', children = [
+                                    dcc.Graph(figure=fig,config={'displayModeBar': False})
+                                ]),
+                            ]),
+                        ])
+                    ]),
+                    dbc.Tab(label = 'Average rating per rating', children = [
+                        html.Div([
+                            html.H2("Count and average rating per genre", className= 'p-3'),
+                            html.Div(children = [
+                                html.Div(className = 'static_graph', children = [
+                                    dcc.Graph(figure=fig2,config={'displayModeBar': False})
+                                ]),
+                            ]),
+                        ])
+                    ]),
+                    dbc.Tab(label = 'Genre popularity by decade', children = [
+                        html.Div([
+                            html.H2("Genre popularity by decade", className= 'p-3'),
+                            html.Div(children = [
+                                html.Div(className = 'static_graph', children = [
+                                    dcc.Graph(figure=fig3,config={'displayModeBar': False})
+                                ]),
+                            ]),
+                        ])
+                    ]),
+                    dbc.Tab(label = 'Vote count and rating', children = [
+                        html.Div([
+                            html.H2("Vote count and rating around the years", className= 'p-3'),
+                            html.Div(children = [
+                                html.Div(className = 'static_graph', children = [
+                                    dcc.Graph(figure=fig4,config={'displayModeBar': False})
+                                ]),
+                            ]),
+                        ])
+                    ]),
+                    dbc.Tab(label = 'Cast count and rating', children = [
+                        dbc.Row(children = [
+                            html.H2("Cast with most appearances and highest average rating", className= 'p-3'),
+                            dbc.Col(md = 3,children = [
+                                html.Div([
+                                    html.Div(children=[
+                                        html.H4('Select number of appearances or rating', className= 'p-1'),
+                                        dcc.Dropdown(id="s_slct",
+                                                        options=[
+                                                            {'label':'Appearances','value':'Count'},
+                                                            {'label':'Average rating','value':'Rating'}
+                                                        ],
+                                                        multi=False,
+                                                        value="Count",
+                                                        className='dropdown'
+                                        ),
+                                        html.H4('Select crew member', className= 'p-1'),
+                                        dcc.Dropdown(id="t_slct",
+                                                        options=[
+                                                            {'label':'Actors/Actresses','value':'Actors'},
+                                                            {'label':'Directors','value':'Directors'}
+                                                        ],
+                                                        multi=False,
+                                                        value="Actors",
+                                                        className='dropdown'
+                                        )
+                                    ]),
+                                ])
+                            ]),
+                            dbc.Col(md = 9, children = [
+                                html.Div(children = [
+                                    dcc.Graph(id='fig5', figure={},config={'displayModeBar': False})
+                                ]),
+                            ])
+                        ])
+                    ])
+                ])
+        ])
 ])
 
 @app.callback(
@@ -192,6 +218,7 @@ app.layout = html.Div(children = [
     [Input(component_id='s_slct', component_property='value'),
     Input(component_id='t_slct', component_property='value')]
 )
+
 
 def update_graph(s_slct,t_slct):
     
@@ -239,7 +266,6 @@ def update_graph(s_slct,t_slct):
         autosize = True,
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
-        font=dict(family = 'Arial',color = '#F8F8FF'),
         margin=dict(l=5, r=0, t=25, b=0)
     )
 
